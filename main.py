@@ -25,7 +25,7 @@ while True:
 
     # Pré-processa a imagem (como no detect.py)
     img = letterbox(frame, imgsz, stride=model.stride, auto=True)[0]
-    img = img.transpose((2, 0, 1))[::-1].copy()  # BGR → RGB, HWC → CHW
+    img = img.transpose((2, 0, 1))[::-1].copy()  # BGR → RGB, HWC → CHW \\ altera o formato da imagem
     img = torch.from_numpy(img).to(device).float() / 255.0
     if img.ndimension() == 3:
         img = img.unsqueeze(0)
@@ -33,6 +33,8 @@ while True:
     # Inferência
     pred = model(img, augment=False, visualize=False)
     pred = non_max_suppression(pred, 0.25, 0.45, classes=None, agnostic=False)
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
 
     # Processa as detecções
     for det in pred:
@@ -42,7 +44,7 @@ while True:
                 x1, y1, x2, y2 = map(int, xyxy)
                 w, h = x2 - x1, y2 - y1
                 label = names[int(cls)]
-                print(f"Objeto: {label}, Confiança: {conf:.2f}, Caixa: x={x1}, y={y1}, w={w}, h={h}")
+                print(f"Objeto: {label}, Confiança: {conf:.2f}, Caixa: x={x1}, y={y1}, w={w}, h={h}, FPS: {fps:.2f}")
 
                 # Aqui você pode usar a posição do objeto (centro da caixa)
                 cx = x1 + w // 2
@@ -53,8 +55,7 @@ while True:
                 cv2.putText(frame, f"{label} {conf:.2f}", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-                # 🚗 Aqui é onde entra a lógica para o carrinho
-                # Exemplo: se cx < largura/2 → vira esquerda, senão direita
+                # Aqui é onde entra a lógica para o carrinho
                 if cx < frame.shape[1]//2:
                     print("Vira esquerda")
                 else:
