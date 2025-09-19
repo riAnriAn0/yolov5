@@ -32,7 +32,7 @@ while True:
 
     # Inferência
     pred = model(img, augment=False, visualize=False)
-    pred = non_max_suppression(pred, 0.25, 0.45, classes=None, agnostic=False)
+    pred = non_max_suppression(pred, 0.25, 0.45, classes=[64], agnostic=False) # filtra apenas mouse (classe 64 no COCO)
 
     fps = cap.get(cv2.CAP_PROP_FPS)
 
